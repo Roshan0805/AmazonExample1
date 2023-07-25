@@ -32,9 +32,11 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
 
     private static final ProductServiceDao PRODUCT_SERVICE_DAO = new ProductServiceDaoImpl();
     private final DBConnection dbConnection;
+    private final DataSourceDBConnection dataSourceDBConnection;
 
     private ProductServiceDaoImpl() {
         dbConnection = DBConnection.getInstance();
+        dataSourceDBConnection = DataSourceDBConnection.getInstance();
     }
 
     /**
@@ -58,7 +60,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      *@throws DBException Represents any error occur while executing a query
      */
     public boolean add(final Product product) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "INSERT INTO PRODUCT (NAME, DESCRIPTION, AVAILABLE, PRICE, CATEGORY, UPDATED_TIME, USER_ID) values (?,?,?,?,?::product_category,?,?)";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -73,7 +75,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -87,7 +89,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public Collection<Product> getAllProducts() {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final Collection<Product> productList = new ArrayList<>();
             final String query = "SELECT * FROM PRODUCT";
             final PreparedStatement statement = connection.prepareStatement(query);
@@ -110,7 +112,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
 
             return productList;
 
-        } catch (SQLException | InterruptedException exception) {;
+        } catch (SQLException exception) {;
             throw new DBException(exception.getMessage());
         }
     }
@@ -125,7 +127,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
     public Map<Long, Product> getUserProduct(final Long userId) {
         final Map<Long, Product> productList = new HashMap<>();
 
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "SELECT * FROM PRODUCT WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -146,7 +148,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
                 productList.put(product.getId(), product);
             }
             dbConnection.release(connection);
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
 
@@ -163,7 +165,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public Product get(final Long productId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "SELECT * FROM PRODUCT WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -185,7 +187,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
 
                 return product;
             }
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             System.out.println(exception.getMessage());
             throw new DBException(exception.getMessage());
         }
@@ -203,7 +205,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean update(final Long id, final Product product) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "UPDATE PRODUCT SET NAME = ?, DESCRIPTION = ?, AVAILABLE = ?, PRICE = ?, CATEGORY = ?::PRODUCT_CATEGORY, UPDATED_TIME = ?, USER_ID = ? WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -219,7 +221,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -234,7 +236,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean delete(final Long id) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "DELETE FROM PRODUCT WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -243,7 +245,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -257,7 +259,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean addToCart(final Cart cart) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "INSERT INTO CART (PRODUCT_ID, QUANTITY, PRICE, USER_ID, NAME) VALUES (?,?,?,?,?)";
             final PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, cart.getProductId());
@@ -269,7 +271,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -283,7 +285,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public List<Cart> getCartList(final Long id) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final List<Cart> cartList = new LinkedList<>();
             final String query = "SELECT * FROM CART WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
@@ -305,7 +307,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return cartList;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -319,7 +321,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public Cart getCart(final Long id) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "SELECT * FROM CART WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -341,7 +343,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             }
 
             return null;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -355,7 +357,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean removeCart(final Long cartId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "DELETE FROM CART WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -364,7 +366,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -378,7 +380,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public List<Long> getCartProductIds(final Long userId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final List<Long> productIds = new LinkedList<>();
             final String query = "SELECT PRODUCT_ID FROM CART WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
@@ -392,7 +394,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return productIds;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -408,7 +410,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean updateQuantityInCart(final Long quantity, final Long productId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "UPDATE CART SET QUANTITY = QUANTITY + ? , PRICE = PRICE + WHERE PRODUCT_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -418,7 +420,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -434,7 +436,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean updateQuantityInProduct(final Long quantity, final Long productId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "UPDATE PRODUCT SET AVAILABLE = AVAILABLE + ? WHERE PRODUCT_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -444,7 +446,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -459,7 +461,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean order(final Order order) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String orderQuery = "INSERT INTO ORDERS (PRODUCT_ID, QUANTITY, PRICE, PRODUCT_NAME, USER_ID, PAYMENT_TYPE) VALUES (?,?,?,?,?,?::payment_types)";
             final PreparedStatement statement = connection.prepareStatement(orderQuery);
 
@@ -472,7 +474,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             statement.execute();
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -487,7 +489,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public List<Order> getOrderList(final Long userId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final List<Order> orderList = new ArrayList<>();
             final String query = "SELECT * FROM ORDERS WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
@@ -510,7 +512,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return orderList;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -522,7 +524,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public Order getOrder(final Long orderId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "SELECT * FROM ORDERS WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -541,7 +543,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return order;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -553,7 +555,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean cancelOrder(final Long orderId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "DELETE FROM ORDERS WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -570,7 +572,7 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }

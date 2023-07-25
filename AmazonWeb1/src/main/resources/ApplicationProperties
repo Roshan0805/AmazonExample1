@@ -2,6 +2,7 @@ name = Amazon
 created by = Roshan
 version = 1.0
 mainClass = ActivatorView
+classname=org.postgresql.Driver
 database_url=jdbc:postgresql://localhost:5432/Amazon
 user=postgres
 password=roshan

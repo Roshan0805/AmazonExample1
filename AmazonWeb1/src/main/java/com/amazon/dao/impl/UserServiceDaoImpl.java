@@ -23,9 +23,11 @@ public class UserServiceDaoImpl implements UserServiceDao {
 
     private static final UserServiceDao USER_SERVICE_DAO = new UserServiceDaoImpl();
     private final DBConnection dbConnection ;
+    private final DataSourceDBConnection dataSourceDBConnection ;
 
     private UserServiceDaoImpl() {
        dbConnection = DBConnection.getInstance();
+       dataSourceDBConnection = DataSourceDBConnection.getInstance();
     }
 
     /**
@@ -50,7 +52,7 @@ public class UserServiceDaoImpl implements UserServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public User getDetails(final Long id) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "SELECT * FROM USERS WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -70,7 +72,7 @@ public class UserServiceDaoImpl implements UserServiceDao {
 
                 return user;
             }
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
         return null;
@@ -86,7 +88,7 @@ public class UserServiceDaoImpl implements UserServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean deleteUser(final Long user_id) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "DELETE FROM USERS WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -95,7 +97,7 @@ public class UserServiceDaoImpl implements UserServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -107,7 +109,7 @@ public class UserServiceDaoImpl implements UserServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public Collection<User> getAllUser() {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "SELECT * FROM USERS";
             final PreparedStatement statement = connection.prepareStatement(query);
             final ResultSet result = statement.executeQuery();
@@ -127,7 +129,7 @@ public class UserServiceDaoImpl implements UserServiceDao {
             dbConnection.release(connection);
 
             return userList;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }
@@ -143,7 +145,7 @@ public class UserServiceDaoImpl implements UserServiceDao {
      * @throws DBException Represents any error occur while executing a query
      */
     public boolean update(final User user, final Long userId) {
-        try (final Connection connection = dbConnection.get()) {
+        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
             final String query = "UPDATE USERS SET NAME = ?, EMAIL = ?, PASSWORD = ?, ADDRESS = ?, PHONE_NUMBER = ?  where ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -157,7 +159,7 @@ public class UserServiceDaoImpl implements UserServiceDao {
             dbConnection.release(connection);
 
             return true;
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             throw new DBException(exception.getMessage());
         }
     }

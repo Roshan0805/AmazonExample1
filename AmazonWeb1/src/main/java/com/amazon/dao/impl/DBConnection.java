@@ -75,10 +75,10 @@ public class DBConnection {
      */
     private Connection getConnection() throws SQLException, ClassNotFoundException {
 
-        Class.forName("org.postgresql.Driver");
         final Properties properties = new Properties();
         try (FileInputStream file = new FileInputStream("C:\\Users\\krith\\IdeaProjects\\amazon\\src\\main\\resources\\ApplicationProperties")) {
             properties.load(file);
+            Class.forName(properties.getProperty("classname"));
             final String url = properties.getProperty("database_url");
             final String user = properties.getProperty("user");
             final String password = properties.getProperty("password");
