@@ -1,6 +1,6 @@
 package com.amazon.service.Impl2;
 
-import com.amazon.dao.AuthenticationServiceDao;
+import com.amazon.dao.AuthenticationDao;
 import com.amazon.model.User;
 import com.amazon.service.AuthenticationService;
 
@@ -15,11 +15,11 @@ import com.amazon.service.AuthenticationService;
 public class AuthenticationServiceImpl2 implements AuthenticationService {
 
     private static final AuthenticationService AUTHENTICATION_SERVICE = new AuthenticationServiceImpl2();
-    private final AuthenticationServiceDao authenticationServiceDao;
+    private final AuthenticationDao authenticationDao;
 
     private AuthenticationServiceImpl2() {
 
-        authenticationServiceDao = AuthenticationServiceDao.getInstance();
+        authenticationDao = AuthenticationDao.getInstance();
     }
 
     /**
@@ -35,26 +35,26 @@ public class AuthenticationServiceImpl2 implements AuthenticationService {
 
     /**
      * <p>
-     * Provides {@link User} sign in
+     *  performs authentication by comparing the provided username and password with the corresponding user record in the user database.
      * </p>
      *
-     * @param email    User's email id
-     * @param password User's password
-     * @return True if email and password match the user from the users list
+     * @param email    Describe User's email
+     * @param password Describe User's password
+     * @return True if provided username and password is correct otherwise return false
      */
-    public boolean signIn(String email, String password) {
-        return authenticationServiceDao.signIn(email, password);
+    public boolean userValidation(final String email, final String password) {
+        return authenticationDao.userValidation(email, password);
     }
 
     /**
      * <p>
-     * Provides {@link User} sign up
+     * It validates the provided user details and creates a new user account if the information is valid and not already taken.
      * </p>
      *
-     * @param user User object is passed as a parameter
+     * @param user Describes {@link User}
      */
-    public boolean signUp(User user) {
-        return authenticationServiceDao.signUp(user);
+    public boolean createUser(final User user) {
+        return authenticationDao.createUser(user);
     }
 
     /**
@@ -65,8 +65,8 @@ public class AuthenticationServiceImpl2 implements AuthenticationService {
      * @param email User's email
      * @return True if the email id is already present on the user list
      */
-    public boolean isUserEmailExists(String email) {
-        return authenticationServiceDao.isUserEmailExists(email);
+    public boolean isUserEmailExists(final String email) {
+        return authenticationDao.isUserEmailExists(email);
     }
 
     /**
@@ -77,8 +77,7 @@ public class AuthenticationServiceImpl2 implements AuthenticationService {
      * @param phoneNumber User's email
      * @return True if the email id is already present on the user list
      */
-    public boolean isNumberExists(String phoneNumber) {
-        return authenticationServiceDao.isNumberExists(phoneNumber);
+    public boolean isNumberExists(final String phoneNumber) {
+        return authenticationDao.isNumberExists(phoneNumber);
     }
-
 }

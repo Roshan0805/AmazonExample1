@@ -1,6 +1,6 @@
 package com.amazon.dao.impl;
 
-import com.amazon.exception.DBException;
+import com.amazon.exception.DatabaseException;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
@@ -8,35 +8,49 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+public class DatabaseConnector {
 
-public class DataSourceDBConnection {
-
-    private static final DataSourceDBConnection DATA_SOURCE_DB_CONNECTION = new DataSourceDBConnection();
+    private static final DatabaseConnector DATA_SOURCE_DB_CONNECTION = new DatabaseConnector();
     private final BasicDataSource dataSource;
-    private DataSourceDBConnection() {
+
+    private DatabaseConnector() {
         dataSource = new BasicDataSource();
     }
 
-    public static DataSourceDBConnection getInstance() {
-        return  DATA_SOURCE_DB_CONNECTION;
+    /**
+     * <p>
+     * Method to provide access to the single instance
+     * </p>
+     *
+     * @return {@link DatabaseConnector}
+     */
+    public static DatabaseConnector getInstance() {
+        return DATA_SOURCE_DB_CONNECTION;
     }
 
+    /**
+     * <p>
+     * This method is used to obtain the data source for database connection
+     * </p>
+     *
+     * @return Describes the data source object
+     */
     public DataSource getDataSource() {
         final String filePath = "C:\\Users\\krith\\IdeaProjects\\AmazonWeb1\\src\\main\\resources\\ApplicationProperties";
         final Properties properties = new Properties();
 
-        try(final FileInputStream file = new FileInputStream( filePath)) {
+        try (final FileInputStream file = new FileInputStream(filePath)) {
             properties.load(file);
             dataSource.setDriverClassName(properties.getProperty("classname"));
             dataSource.setUrl(properties.getProperty("database_url"));
             dataSource.setUsername(properties.getProperty("user"));
             dataSource.setPassword(properties.getProperty("password"));
-            dataSource.setMaxIdle(20);
-            dataSource.setMinIdle(10);
+            dataSource.setMaxIdle(Integer.parseInt(properties.getProperty("max")));
+            dataSource.setMinIdle(Integer.parseInt(properties.getProperty("min")));
 
             return dataSource;
         } catch (IOException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 }

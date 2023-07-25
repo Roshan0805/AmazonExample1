@@ -18,14 +18,14 @@ import java.util.concurrent.BlockingQueue;
  * @version 1.0
  */
 
-public class DBConnection {
+public class DatabaseConnector2 {
 
-    private static DBConnection DB_CONNECTION;
+    private static DatabaseConnector2 DB_CONNECTION;
     private final Integer maxSize ;
     private static BlockingQueue<Connection> pool;
 
 
-    private DBConnection() {
+    private DatabaseConnector2() {
         maxSize = 15;
         pool = new ArrayBlockingQueue<>(maxSize);
 
@@ -34,14 +34,14 @@ public class DBConnection {
 
     /**
      * <p>
-     * Represents the instance of DBConnection class can be created for only once
+     * Method to provide access to the single instance for accessing
      * </p>
      *
-     * @return Represents {@link DBConnection }
+     * @return Represents {@link DatabaseConnector2 }
      */
-    public static DBConnection getInstance() {
+    public static DatabaseConnector2 getInstance() {
         if (null == DB_CONNECTION) {
-            DB_CONNECTION = new DBConnection();
+            DB_CONNECTION = new DatabaseConnector2();
         }
         return DB_CONNECTION;
     }

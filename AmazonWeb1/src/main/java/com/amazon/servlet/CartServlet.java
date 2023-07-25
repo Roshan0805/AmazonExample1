@@ -28,7 +28,7 @@ public class CartServlet extends HttpServlet {
     private final ProductController productController;
 
     public CartServlet() {
-        productController = ProductController.getInstance();
+        this.productController = ProductController.getInstance();
     }
 
     /**

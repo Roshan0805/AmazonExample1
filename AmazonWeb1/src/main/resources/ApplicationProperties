@@ -6,3 +6,5 @@ classname=org.postgresql.Driver
 database_url=jdbc:postgresql://localhost:5432/Amazon
 user=postgres
 password=roshan
+max=20
+min=10

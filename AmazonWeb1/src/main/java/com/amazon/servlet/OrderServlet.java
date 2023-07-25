@@ -1,9 +1,9 @@
 package com.amazon.servlet;
 
 import com.amazon.controller.ProductController;
-import com.amazon.exception.DBException;
+import com.amazon.exception.DatabaseException;
 import com.amazon.exception.ServletException;
-import com.amazon.exception.UnavailableQuantityException;
+import com.amazon.exception.OutOfStockException;
 import com.amazon.model.Order;
 import com.amazon.model.Product;
 import org.json.JSONObject;
@@ -28,7 +28,7 @@ public class OrderServlet extends HttpServlet {
     private final ProductController productController;
 
     public OrderServlet() {
-        productController = ProductController.getInstance();
+        this.productController = ProductController.getInstance();
     }
 
     /**
@@ -54,7 +54,7 @@ public class OrderServlet extends HttpServlet {
             final Product product = productController.get(orderJson.getLong("productId"));
 
             if (product.getAvailable() < orderJson.getLong("quantity")) {
-                throw new UnavailableQuantityException("Un available quantity");
+                throw new OutOfStockException("Un available quantity");
             }
             final Order order = new Order();
 
@@ -67,19 +67,15 @@ public class OrderServlet extends HttpServlet {
 
             final JSONObject responseData = new JSONObject();
 
-            if (productController.order(order)) {
-                responseData.put("Message", "Product added successfully");
-            } else {
-                responseData.put("Message", "Product added unsuccessful");
-            }
+            responseData.put("Message",(productController.order(order)) ? "Ordered successfully" : "order unsuccessful");
             response.setContentType("application/json");
             final PrintWriter writer = response.getWriter();
 
             writer.println(responseData);
         } catch (IOException exception) {
             throw new ServletException(exception.getMessage());
-        } catch (UnavailableQuantityException exception) {
-            throw new DBException("Unavailable quantity");
+        } catch (OutOfStockException exception) {
+            throw new DatabaseException("Unavailable quantity");
         }
     }
 

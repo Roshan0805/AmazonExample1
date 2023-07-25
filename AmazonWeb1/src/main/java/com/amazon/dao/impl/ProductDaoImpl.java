@@ -1,7 +1,7 @@
 package com.amazon.dao.impl;
 
-import com.amazon.dao.ProductServiceDao;
-import com.amazon.exception.DBException;
+import com.amazon.dao.ProductDao;
+import com.amazon.exception.DatabaseException;
 import com.amazon.model.Cart;
 import com.amazon.model.Order;
 import com.amazon.model.Product;
@@ -22,45 +22,44 @@ import java.util.Map;
 
 /**
  * <p>
- * Implements the {@link ProductServiceDao} and provide {@link Product} service
+ * Implements the {@link ProductDao} and provide {@link Product} service
  * </p>
  *
  * @author Roshan
  * @version 1.0
  */
-public class ProductServiceDaoImpl implements ProductServiceDao {
+public class ProductDaoImpl implements ProductDao {
 
-    private static final ProductServiceDao PRODUCT_SERVICE_DAO = new ProductServiceDaoImpl();
-    private final DBConnection dbConnection;
-    private final DataSourceDBConnection dataSourceDBConnection;
+    private static final ProductDao PRODUCT_SERVICE_DAO = new ProductDaoImpl();
+    private final DatabaseConnector database;
 
-    private ProductServiceDaoImpl() {
-        dbConnection = DBConnection.getInstance();
-        dataSourceDBConnection = DataSourceDBConnection.getInstance();
+    private ProductDaoImpl() {
+        this.database = DatabaseConnector.getInstance();
     }
 
     /**
      * <p>
-     * Represents the object of {@link ProductServiceDaoImpl} class can be created for only one time
+     * Method to provide access to the single instance for accessing
      * </p>
      *
-     * @return Represents {@link ProductServiceDao}
+     * @return Represents {@link ProductDao}
      */
-    public static ProductServiceDao getInstance() {
+    public static ProductDao getInstance() {
         return PRODUCT_SERVICE_DAO;
     }
 
     /**
+     /**
      * <p>
-     * Add product to the product list
+     * This method is used to add a new product to the database
      * </p>
      *
-     * @param product Product object
-     * @return Boolean true is the {@link Product} added successfully in the product list otherwise return false
-     *@throws DBException Represents any error occur while executing a query
+     * @param product Represents {@link Product}
+     * @return True if the {@link Product} is added successfully in the product list otherwise return false
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
-    public boolean add(final Product product) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+    public boolean create(final Product product) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "INSERT INTO PRODUCT (NAME, DESCRIPTION, AVAILABLE, PRICE, CATEGORY, UPDATED_TIME, USER_ID) values (?,?,?,?,?::product_category,?,?)";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -72,11 +71,10 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             statement.setTimestamp(6, product.getUpdatedTime());
             statement.setLong(7, product.getUserId());
             statement.executeUpdate();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
@@ -86,10 +84,10 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * </p>
      *
      * @return Collection view of {@link Product}
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
-    public Collection<Product> getAllProducts() {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+    public Collection<Product> getProducts() {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final Collection<Product> productList = new ArrayList<>();
             final String query = "SELECT * FROM PRODUCT";
             final PreparedStatement statement = connection.prepareStatement(query);
@@ -108,12 +106,11 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
                 product.setUserId(result.getLong("USER_ID"));
                 productList.add(product);
             }
-            dbConnection.release(connection);
 
             return productList;
 
         } catch (SQLException exception) {;
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
@@ -122,12 +119,12 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      *
      * @param userId Represents admin id
      * @return Represents {@link Product} list created by the user
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public Map<Long, Product> getUserProduct(final Long userId) {
         final Map<Long, Product> productList = new HashMap<>();
 
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "SELECT * FROM PRODUCT WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -147,9 +144,8 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
                 product.setUserId(result.getLong("USER_ID"));
                 productList.put(product.getId(), product);
             }
-            dbConnection.release(connection);
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
 
         return productList;
@@ -162,10 +158,10 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      *
      * @param productId product id of the product object
      * @return Represent {@link Product} in product list
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public Product get(final Long productId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "SELECT * FROM PRODUCT WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -183,13 +179,11 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
                 product.setCategory(Product.Category.valueOf(result.getString("CATEGORY")));
                 product.setUpdatedTime(result.getTimestamp("UPDATED_TIME"));
                 product.setUserId(result.getLong("USER_ID"));
-                dbConnection.release(connection);
 
                 return product;
             }
         } catch (SQLException exception) {
-            System.out.println(exception.getMessage());
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
         return null;
     }
@@ -202,10 +196,10 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      * @param id      Product id of the product
      * @param product Represent {@link Product}
      * @return True if the {@link Product} is updated successfully in the product list otherwise return false
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean update(final Long id, final Product product) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "UPDATE PRODUCT SET NAME = ?, DESCRIPTION = ?, AVAILABLE = ?, PRICE = ?, CATEGORY = ?::PRODUCT_CATEGORY, UPDATED_TIME = ?, USER_ID = ? WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -218,11 +212,10 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             statement.setLong(7, product.getUserId());
             statement.setLong(8, id);
             statement.execute();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
@@ -233,33 +226,32 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
      *
      * @param id id of the product object
      * @return True if the {@link Product} deleted successfully in the product list otherwise return false
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean delete(final Long id) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "DELETE FROM PRODUCT WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setLong(1, id);
             statement.executeUpdate();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      *<p>
-     *     Represents the adding a product to the cart
+     *     Describes the adding a product to the cart
      *</p>
      * @param cart Represents {@link Cart}
      * @return True if product added to cart successfully
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean addToCart(final Cart cart) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "INSERT INTO CART (PRODUCT_ID, QUANTITY, PRICE, USER_ID, NAME) VALUES (?,?,?,?,?)";
             final PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, cart.getProductId());
@@ -268,24 +260,23 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             statement.setLong(4, cart.getUserId());
             statement.setString(5, cart.getProductName());
             statement.execute();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      * <p>
-     *     Represents the product details from the cart for a particular user
+     *     Describes the product details from the cart for a particular user
      * </p>
      * @param id Represents the id of {@link User}
      * @return Represents the list of products from the cart
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public List<Cart> getCartList(final Long id) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final List<Cart> cartList = new LinkedList<>();
             final String query = "SELECT * FROM CART WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
@@ -304,24 +295,23 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
                 cart.setUserId(result.getLong("USER_ID"));
                 cartList.add(cart);
             }
-            dbConnection.release(connection);
 
             return cartList;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      * <p>
-     *     Represents the product details from the cart for a particular user
+     *     Defines the product details from the cart for a particular user
      * </p>
      * @param id Represents the id of {@link User}
      * @return Represents the list of products from the cart
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public Cart getCart(final Long id) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "SELECT * FROM CART WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -337,50 +327,48 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
                 cart.setQuantity(result.getLong("QUANTITY"));
                 cart.setPrice(result.getDouble("TOTAL_PRICE"));
                 cart.setUserId(result.getLong("USER_ID"));
-                dbConnection.release(connection);
 
                 return cart;
             }
 
             return null;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      * <p>
-     *     Represents removing a product from the cart
+     *     Defines removing a product from the cart
      * </p>
      * @param cartId Represents the cart id for remove
      * @return true if the product is removed successfully from the cart
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
-    public boolean removeCart(final Long cartId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+    public boolean removeFromCart(final Long cartId) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "DELETE FROM CART WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setLong(1, cartId);
             statement.execute();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      * <p>
-     *     Represents getting all the product id from the cart list
+     *     Describes getting all the product id from the cart list
      * </p>
      * @param userId Represents the id of the {@link User}
      * @return List of product id from the cart
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public List<Long> getCartProductIds(final Long userId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final List<Long> productIds = new LinkedList<>();
             final String query = "SELECT PRODUCT_ID FROM CART WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
@@ -391,77 +379,74 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             while (result.next()) {
                 productIds.add(result.getLong("PRODUCT_ID"));
             }
-            dbConnection.release(connection);
 
             return productIds;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      * <p>
-     *     Represents updating the quantity of product in {@link Cart}
+     *     Describes updating the quantity of product in {@link Cart}
      * </p>
      *
      * @param quantity Quantity need to add with available products
      * @param productId Represents the id of the product need to update the quantity
      * @return True if the quantity updated successfully
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean updateQuantityInCart(final Long quantity, final Long productId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
-            final String query = "UPDATE CART SET QUANTITY = QUANTITY + ? , PRICE = PRICE + WHERE PRODUCT_ID = ?";
+        try (final Connection connection = database.getDataSource().getConnection()) {
+            final String query = "UPDATE CART SET QUANTITY = QUANTITY + ? WHERE PRODUCT_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setLong(1, quantity);
             statement.setLong(2, productId);
             statement.execute();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      * <p>
-     *     Represents updating the quantity of product in {@link Product}
+     *     Describes updating the quantity of product in {@link Product}
      * </p>
      *
      * @param quantity Quantity need to add with available products
      * @param productId Represents the id of the product need to update the quantity
      * @return True if the quantity updated successfully
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean updateQuantityInProduct(final Long quantity, final Long productId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "UPDATE PRODUCT SET AVAILABLE = AVAILABLE + ? WHERE PRODUCT_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setLong(1, quantity);
             statement.setLong(2, productId);
             statement.execute();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      * <p>
-     *     Represents the order of {@link Product}
+     *     processes the order of {@link Product}
      * </p>
      *
      * @param order Represents {@link Order}
      * @return True if the order is added to the order list
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean order(final Order order) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String orderQuery = "INSERT INTO ORDERS (PRODUCT_ID, QUANTITY, PRICE, PRODUCT_NAME, USER_ID, PAYMENT_TYPE) VALUES (?,?,?,?,?,?::payment_types)";
             final PreparedStatement statement = connection.prepareStatement(orderQuery);
 
@@ -475,21 +460,21 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
      * <p>
-     *      Retrieve the List of {@link User} order
+     *      Describes the collection of order for the user from the database
      * </p>
      *
      * @param userId Represents id of {@link User}
      * @return Represents collection of {@link Order}
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public List<Order> getOrderList(final Long userId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final List<Order> orderList = new ArrayList<>();
             final String query = "SELECT * FROM ORDERS WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
@@ -509,22 +494,21 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
                 order.setPaymentType(Order.Payment.valueOf(result.getString("PAYMENT_TYPE")));
                 orderList.add(order);
             }
-            dbConnection.release(connection);
 
             return orderList;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
-     * Represents the order details of the particular order id
+     * Describes the order details of the particular order id
      * @param orderId Represents the id of the {@link Product}
      * @return Represents {@link Order}
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public Order getOrder(final Long orderId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "SELECT * FROM ORDERS WHERE USER_ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -540,22 +524,21 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
                 order.setUserId(result.getLong("USER_ID"));
                 order.setPaymentType(Order.Payment.valueOf(result.getString("PAYMENT_TYPE")));
             }
-            dbConnection.release(connection);
 
             return order;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
-     * Represents the cancelling the order of the particular order id
+     * Describes the cancelling the order of the particular order id
      * @param orderId Represents the id of the {@link Product}
      * @return Represents {@link Order}
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean cancelOrder(final Long orderId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "DELETE FROM ORDERS WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -569,11 +552,10 @@ public class ProductServiceDaoImpl implements ProductServiceDao {
             statement1.setLong(1, order.getQuantity());
             statement1.setLong(2, order.getProductId());
             statement1.execute();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 }

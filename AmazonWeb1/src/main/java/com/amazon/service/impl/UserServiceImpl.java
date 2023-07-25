@@ -19,14 +19,14 @@ public class UserServiceImpl implements UserService {
 
     private static final UserServiceImpl USER_SERVICE = new UserServiceImpl();
 
-    public static final Map<Long, User> usersList = new HashMap<>();
+    public static final Map<Long, User> USERS = new HashMap<>();
 
     private UserServiceImpl() {
     }
 
     /**
      * <p>
-     * Represents the object of {@link UserServiceImpl} class can be created for only one time
+     * Method to provide access to the single instance for accessing
      * </p>
      *
      * @return Represents {@link UserServiceImpl}
@@ -35,19 +35,22 @@ public class UserServiceImpl implements UserService {
         return USER_SERVICE;
     }
 
-
     /**
-     * {@inheritDoc}
+     * <p>
+     * Retrieves the user details
+     * </p>
      *
      * @param id Represents user id
      * @return Represents {@link User}
      */
     public User get(final Long id) {
-        return usersList.get(id);
+        return USERS.get(id);
     }
 
     /**
-     * {@inheritDoc}
+     * <p>
+     * Describes the user delete from database
+     * </p>
      *
      * @param user_id User object wants to delete
      * @return True is the user is deleted successfully
@@ -56,18 +59,20 @@ public class UserServiceImpl implements UserService {
         if (0 == user_id) {
             return false;
         }
-        usersList.remove(user_id);
+        USERS.remove(user_id);
 
         return true;
     }
 
     /**
-     * {@inheritDoc}
+     * <p>
+     * Retrieves a list of all users from the data source
+     * </p>
      *
-     * @return Represents Collection of {@link User} in the usersList
+     * @return A list containing all user records retrieved from the data source.
      */
-    public Collection<User> getAllUser() {
-        return usersList.values();
+    public Collection<User> getUsers() {
+        return USERS.values();
     }
 
     /**
@@ -77,13 +82,23 @@ public class UserServiceImpl implements UserService {
      * @param id   Represents the id of user
      * @return True if the user is updated successfully
      */
-    public boolean update(User user, Long id) {
+    public boolean update(final User user, final Long id) {
         try {
-            usersList.put(id, user);
+            USERS.put(id, user);
 
             return true;
         } catch (Exception exception) {
             return false;
         }
+    }
+
+    /**
+     * <p>
+     *     Retrieves the user's list
+     * </p>
+     * @return Represents the list of users
+     */
+    public Map<Long, User> getUsersList() {
+        return USERS;
     }
 }

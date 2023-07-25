@@ -1,27 +1,28 @@
-package com.amazon.service;
+package com.amazon.dao;
 
+import com.amazon.dao.impl.AuthenticationDaoImpl;
 import com.amazon.model.User;
 
 /**
  * <p>
- *     Provide Service for Authentication
+ * Represents the {@link AuthenticationDao} service
  * </p>
  *
- * @author Roshan B
+ * @author Roshan
  * @version 1.0
  */
-public interface AuthenticationService {
+public interface AuthenticationDao {
 
     /**
      * <p>
-     *  performs authentication by comparing the provided username and password with the corresponding user record in the user database.
+     * Method to provide access to the single instance for accessing
      * </p>
      *
-     * @param email    Describe User's email
-     * @param password Describe User's password
-     * @return True if provided username and password is correct otherwise return false
+     * @return Represents  {@link AuthenticationDao}
      */
-    boolean userValidation(final String email, final String password);
+    static AuthenticationDao getInstance() {
+        return AuthenticationDaoImpl.getInstance();
+    }
 
     /**
      * <p>
@@ -31,6 +32,17 @@ public interface AuthenticationService {
      * @param user Describes {@link User}
      */
     boolean createUser(final User user);
+
+    /**
+     * <p>
+     * performs authentication by comparing the provided username and password with the corresponding user record in the user database.
+     * </p>
+     *
+     * @param email    Describe User's email
+     * @param password Describe User's password
+     * @return True if provided username and password is correct otherwise return false
+     */
+    boolean userValidation(final String email, final String password);
 
     /**
      * <p>

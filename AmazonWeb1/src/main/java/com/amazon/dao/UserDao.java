@@ -12,7 +12,7 @@ import java.util.Collection;
  * @author Roshan
  * @version 1.0
  */
-public interface UserServiceDao {
+public interface UserDao {
 
 
     /**
@@ -36,10 +36,13 @@ public interface UserServiceDao {
     boolean deleteUser(final Long user_id);
 
     /**
-     * Represents all the {@link User} details in the usersList
-     * @return Represents collection of {@link User}
+     * <p>
+     *     Retrieves a list of all users from the data source
+     * </p>
+     *
+     * @return A list containing all user records retrieved from the data source.
      */
-    Collection<User> getAllUser();
+    Collection<User> getUsers();
 
     /**
      * <p>

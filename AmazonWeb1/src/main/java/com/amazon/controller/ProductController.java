@@ -23,16 +23,14 @@ public class ProductController {
 
     private static final ProductController PRODUCT_CONTROLLER = new ProductController();
     private final ProductService productService;
-    private final ProductService productService2;
 
     private ProductController() {
-        productService = ProductService.getInstance();
-        productService2 = ProductServiceImpl2.getInstance();
+        productService = ProductServiceImpl2.getInstance();
     }
 
     /**
      * <p>
-     * Represents the object of AmazonProductController class can be created for only one time
+     * Method to provide access to the single instance
      * </p>
      *
      * @return Represents {@link ProductController}
@@ -43,54 +41,54 @@ public class ProductController {
 
     /**
      * <p>
-     * adds the product object to product list
+     * This method is used to add a new product to the database
      * </p>
      *
      * @param product Represents {@link Product}
      * @return True if the {@link Product} is added successfully in the product list otherwise return false
      */
-    public boolean add(final Product product) {
-        return productService2.add(product);
+    public boolean create(final Product product) {
+        return productService.create(product);
     }
 
     /**
      * <p>
-     * Gets the products from product list
+     * Retrieves a list of all products from the database
      * </p>
      *
      * @return Collection view of products from the viewProduct method
      */
-    public Collection<Product> getAllProduct() {
-        return productService2.getAllProducts();
+    public Collection<Product> getProducts() {
+        return productService.getProducts();
     }
 
     /**
      * <p>
-     * Represents the product details that the user create
+     * Describe the product details that are created by the user
      * </p>
      *
      * @param userId Represents admin id
      * @return Represents {@link Product} list created by the user
      */
-    public Map<Long, Product> getUserProduct(final Long userId) {
-        return productService2.getUserProduct(userId);
+    public Map<Long, Product> getUserProducts(final Long userId) {
+        return productService.getUserProduct(userId);
     }
 
     /**
      * <p>
-     * get the product object from the product list
+     * Retrieve product object from the database corresponding to the product id
      * </p>
      *
-     * @param productId id of the product
+     * @param productId describe id of the product
      * @return Represents {@link Product}
      */
     public Product get(final Long productId) {
-        return productService2.get(productId);
+        return productService.get(productId);
     }
 
     /**
      * <p>
-     * Updates the product in product list
+     * Updates product information in the database
      * </p>
      *
      * @param id      id of the product
@@ -98,144 +96,144 @@ public class ProductController {
      * @return True if the {@link Product} is updated successfully in the product list otherwise return false
      */
     public boolean update(final Long id, final Product product) {
-        return productService2.update(id, product);
+        return productService.update(id, product);
     }
 
     /**
      * <p>
-     * Deletes the product from product list
+     * Deletes the product from database
      * </p>
      *
      * @param id id of the product
      * @return True if the {@link Product} is deleted successfully in the product list otherwise return false
      */
     public boolean delete(final Long id) {
-        return productService2.delete(id);
+        return productService.delete(id);
     }
 
     /**
      * <p>
-     *     Represents the order of {@link Product}
+     *     Processes a product to order for a customer
      * </p>
      *
      * @param order Represents {@link Order}
-     * @return True if the order is added to the order list
+     * @return True if the order is added to the order list otherwise it returns false
      */
     public boolean order(final Order order) {
-        return productService2.order(order);
+        return productService.order(order);
     }
 
     /**
      * <p>
-     *     Retrieve the List of {@link Order}
+     *     Retrieves a list of all {@link Order} from the database
      * </p>
      *
      * @return Represents collection of {@link Order}
      */
-    public List<Order> getOrderList(final Long userId) {
-        return productService2.getOrderList(userId);
+    public List<Order> getOrdersList(final Long userId) {
+        return productService.getOrderList(userId);
     }
 
     /**
      * <p>
-     *     Represents the order details of the particular order id
+     *     Describes the order details of the particular order id from the database
      * </p>
      *
      * @param orderId Represents the id of the {@link Product}
      * @return Represents {@link Order}
      */
     public Order getOrder(final Long orderId) {
-        return productService2.getOrder(orderId);
+        return productService.getOrder(orderId);
     }
 
     /**
      * <p>
-     *     Represents the cancelling the order of the particular order id
+     *     Describes the cancelling the order of the particular order id
      * </p>
      *
      * @param orderId Represents the id of the {@link Product}
      * @return Represents {@link Order}
      */
     public boolean cancelOrder(final Long orderId) {
-        return productService2.cancelOrder(orderId);
+        return productService.cancelOrder(orderId);
     }
 
     /**
      * <p>
-     *     Represents adding a product to the cart
+     *     Describes adding a product to the cart
      * </p>
      *
      * @param cart Represents the {@link Cart}
-     * @return True if the Product is added successfully in cart
+     * @return True if the Product is added successfully in cart otherwise return false
      */
     public boolean addToCart(final Cart cart) {
-        return productService2.addToCart(cart);
+        return productService.addToCart(cart);
     }
 
     /**
      * <p>
-     *     Represents the Product details from the cart for a particular user
+     *     Describes the Product details from the cart for a particular user
      * </p>
      *
      * @param userId Represents the id of {@link User}
      * @return Collection of products from the cart
      */
-    public List<Cart> getCartList(final Long userId) {
-        return productService2.getCartList(userId);
+    public Collection<Cart> getCartList(final Long userId) {
+        return productService.getCartList(userId);
     }
 
     /**
      * <p>
-     *     Represents the particular id details of entered cart id
+     *     Describes the particular id details of entered cart id
      * </p>
      *
      * @param id Represents the id of the cart
      * @return Represents {@link Cart}
      */
     public Cart getCart(final Long id) {
-        return productService2.getCart(id);
+        return productService.getCart(id);
     }
 
     /**
      * <p>
-     *     Represents the removal of product for the particular cart id
+     *     describes the removal of product for the particular cart id
      * </p>
      *
      * @param cartId Represents the id of the cart
-     * @return True if the Product is removed successfully
+     * @return True if the Product is removed successfully otherwise return false
      */
     public boolean removeCart(final Long cartId) {
-        return productService2.removeCart(cartId);
+        return productService.removeFromCart(cartId);
     }
 
     /**
      * <p>
-     *     Represents the product id's of the user created product
+     *     describes the product id's of the user created product
      * </p>
      *
      * @param userId Represents the id of the {@link User}
-     * @return List of product id's
+     * @return List of product id retrieved from database
      */
     public List<Long> getCartProductIds(final Long userId) {
-        return productService2.getCartProductIds(userId);
+        return productService.getCartProductIds(userId);
     }
 
     /**
      * <p>
-     *     Represents updating the quantity of product in cart
+     *     Describes updating the quantity of product in cart
      * </p>
      *
      * @param quantity  Quantity need to add with available products
      * @param productId Represents the id of the product need to update the quantity
-     * @return True if the product quantity updated successfully
+     * @return True if the product quantity updated successfully otherwise return false
      */
     public boolean updateQuantityInCart(final Long quantity, final Long productId) {
-        return productService2.updateQuantityInCart(quantity, productId);
+        return productService.updateQuantityInCart(quantity, productId);
     }
 
     /**
      * <p>
-     *     Represents updating the quantity of product in {@link Product}
+     *     Describes updating the quantity of product in {@link Product}
      * </p>
      *
      * @param quantity  Quantity need to add with available products
@@ -243,6 +241,6 @@ public class ProductController {
      * @return True if the product quantity updated successfully
      */
     public boolean updateQuantityInProduct(final Long quantity, final Long productId) {
-        return productService2.updateQuantityInProduct(quantity, productId);
+        return productService.updateQuantityInProduct(quantity, productId);
     }
 }

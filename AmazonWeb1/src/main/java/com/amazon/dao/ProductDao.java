@@ -1,12 +1,11 @@
 package com.amazon.dao;
 
-import com.amazon.dao.impl.ProductServiceDaoImpl;
+import com.amazon.dao.impl.ProductDaoImpl;
 import com.amazon.model.Cart;
 import com.amazon.model.Order;
 import com.amazon.model.Product;
 
 import com.amazon.model.User;
-import com.amazon.service.ProductService;
 import com.amazon.service.impl.ProductServiceImpl;
 
 import java.util.Collection;
@@ -21,37 +20,37 @@ import java.util.Map;
  * @author Roshan
  * @version 1.0
  */
-public interface ProductServiceDao {
+public interface ProductDao {
 
     /**
      * <p>
-     * Represents the {@link ProductService} interface implemented class object can be created for only one time
+     * Method to provide access to the single instance for accessing
      * </p>
      *
      * @return Represents the object of {@link ProductServiceImpl}
      */
-    static ProductServiceDao getInstance() {
-           return ProductServiceDaoImpl.getInstance();
+    static ProductDao getInstance() {
+           return ProductDaoImpl.getInstance();
     }
 
     /**
      * <p>
-     * Add product to the product list
+     * This method is used to add a new product to the database
      * </p>
      *
-     * @param product Product object
-     * @return Boolean true is the {@link Product} added successfully in the product list otherwise return false
+     * @param product Represents {@link Product}
+     * @return True if the {@link Product} is added successfully in the product list otherwise return false
      */
-    boolean add(final Product product);
+    boolean create(final Product product);
 
     /**
      * <p>
-     * Provide the collection view of the products value
+     * Retrieves a list of all products from the database
      * </p>
      *
-     * @return Collection view of {@link Product}
+     * @return Collection view of products from the viewProduct method
      */
-    Collection<Product> getAllProducts();
+    Collection<Product> getProducts();
 
     /**
      * <p>
@@ -75,11 +74,11 @@ public interface ProductServiceDao {
 
     /**
      * <p>
-     * Updates product object in product list
+     * Updates product information in the database
      * </p>
      *
-     * @param id      Product id of the product
-     * @param product Represent {@link Product}
+     * @param id      id of the product
+     * @param product Represents {@link Product}
      * @return True if the {@link Product} is updated successfully in the product list otherwise return false
      */
     boolean update(final Long id, final Product product);
@@ -121,7 +120,7 @@ public interface ProductServiceDao {
      * @param cartId Represents the id of the cart
      * @return True if the Product is removed successfully
      */
-    boolean removeCart(final Long cartId);
+    boolean removeFromCart(final Long cartId);
 
     /**
      * Represents the product id's of the user created product

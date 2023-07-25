@@ -3,6 +3,7 @@ package com.amazon.servlet;
 import com.amazon.controller.ProductController;
 import com.amazon.exception.ServletException;
 import com.amazon.model.Product;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <p>
@@ -27,7 +30,7 @@ public class ProductServlet extends HttpServlet {
     private final ProductController productController;
 
     public ProductServlet() {
-        productController = ProductController.getInstance();
+        this.productController = ProductController.getInstance();
     }
 
     /**
@@ -64,11 +67,8 @@ public class ProductServlet extends HttpServlet {
 
             final JSONObject responseData = new JSONObject();
 
-            if (productController.add(product)) {
-                responseData.put("Message", "Product added successfully");
-            } else {
-                responseData.put("Message", "Product added unsuccessful");
-            }
+            responseData.put("Message",(productController.create(product)) ? "Product created successfully" :
+                    "Product created unsuccessful");
             response.setContentType("application/json");
             final PrintWriter writer = response.getWriter();
 
@@ -90,7 +90,6 @@ public class ProductServlet extends HttpServlet {
     public void doGet(final HttpServletRequest request, final HttpServletResponse response) {
 
         try {
-
             final StringBuffer buffer = new StringBuffer();
             String value;
 
@@ -100,25 +99,44 @@ public class ProductServlet extends HttpServlet {
 
             final String json = buffer.toString();
             final JSONObject productJson = new JSONObject(json);
-            final JSONObject responseData = new JSONObject();
-            final Product product = productController.get(productJson.getLong("id"));
-
-            if (product == null) {
-                responseData.put("Invalid id", "Enter a valid id");
-            } else {
-                responseData.put("id", product.getId());
-                responseData.put("name", product.getName());
-                responseData.put("description", product.getDescription());
-                responseData.put("available", product.getAvailable());
-                responseData.put("updatedTime", product.getUpdatedTime());
-                responseData.put("category", product.getCategory());
-                responseData.put("userId", product.getUserId());
-            }
             response.setContentType("application/json");
             final PrintWriter writer = response.getWriter();
 
-            writer.println(responseData);
+            final JSONArray jsonProduct = new JSONArray();
 
+            if (json.isEmpty()) {
+                final Collection<Product> productList = productController.getProducts();
+
+                for(Product product : productList) {
+                    final JSONObject jsonResponse = new JSONObject();
+                    jsonResponse.put("id", product.getId());
+                    jsonResponse.put("name", product.getName());
+                    jsonResponse.put("description", product.getDescription());
+                    jsonResponse.put("available", product.getAvailable());
+                    jsonResponse.put("updatedTime", product.getUpdatedTime());
+                    jsonResponse.put("category", product.getCategory());
+                    jsonResponse.put("userId", product.getUserId());
+
+                    jsonProduct.put(jsonResponse);
+                }
+            } else {
+                final Product product = productController.get(productJson.getLong("id"));
+                final JSONObject jsonResponse = new JSONObject();
+
+                if (product == null) {
+                    jsonResponse.put("Message", "Invalid id enter a valid id");
+                } else {
+                    jsonResponse.put("id", product.getId());
+                    jsonResponse.put("name", product.getName());
+                    jsonResponse.put("description", product.getDescription());
+                    jsonResponse.put("available", product.getAvailable());
+                    jsonResponse.put("updatedTime", product.getUpdatedTime());
+                    jsonResponse.put("category", product.getCategory());
+                    jsonResponse.put("userId", product.getUserId());
+
+                    writer.println(jsonResponse);
+                }
+            }
         } catch (NumberFormatException | IOException exception) {
             throw new ServletException(exception.getMessage());
         }
@@ -186,7 +204,6 @@ public class ProductServlet extends HttpServlet {
     public void doDelete(final HttpServletRequest request, final HttpServletResponse response) {
 
         try {
-
             final StringBuffer buffer = new StringBuffer();
             String value;
 

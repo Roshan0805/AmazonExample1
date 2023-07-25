@@ -3,30 +3,29 @@ package com.amazon.controller;
 import com.amazon.model.User;
 import com.amazon.service.AuthenticationService;
 import com.amazon.service.Impl2.AuthenticationServiceImpl2;
-import com.amazon.service.impl.AuthenticationServiceImpl;
 
 /**
  * <p>
- *     Represents the authentication controller
+ * Describes controller between authentication servlet and authentication service
  * </p>
+ *
  * @author Roshan
  * @version 1.0
  */
 public class AuthenticationController {
 
     private static final AuthenticationController AUTHENTICATION_CONTROLLER = new AuthenticationController();
-    private final AuthenticationService authenticationService2;
     private final AuthenticationService authenticationService;
 
-    private AuthenticationController () {
-        authenticationService2 = AuthenticationServiceImpl2.getInstance();
-        authenticationService = AuthenticationServiceImpl.getInstance();
+    private AuthenticationController() {
+        this.authenticationService = AuthenticationServiceImpl2.getInstance();
     }
 
     /**
      * <p>
-     *     Represents the instance of {@link AuthenticationController} created only ones
+     * Method to provide access to the single instance
      * </p>
+     *
      * @return Represents {@link AuthenticationController}
      */
     public static AuthenticationController getInstance() {
@@ -35,26 +34,26 @@ public class AuthenticationController {
 
     /**
      * <p>
-     * Provides {@link User} sign up
+     * It validates the provided user details and creates a new user account if the information is valid and not already taken.
      * </p>
      *
-     * @param user Represents {@link User}
+     * @param user Describes {@link User}
      */
     public boolean signUp(User user) {
-        return authenticationService2.signUp(user);
+        return authenticationService.createUser(user);
     }
 
     /**
      * <p>
-     * Provides user sign in for user
+     * performs authentication by comparing the provided username and password with the corresponding user record in the user database.
      * </p>
      *
-     * @param email    User's email
-     * @param password User's password
-     * @return Boolean value from the validateUser method on service
+     * @param email    Describe User's email
+     * @param password Describe User's password
+     * @return True if provided username and password is correct otherwise return false
      */
     public boolean signIn(final String email, final String password) {
-        return authenticationService2.signIn(email, password);
+        return authenticationService.userValidation(email, password);
     }
 
 
@@ -67,7 +66,7 @@ public class AuthenticationController {
      * @return True if the email id is already present on the user list
      */
     public boolean isUserEmailExists(String userEmail) {
-        return authenticationService2.isUserEmailExists(userEmail);
+        return authenticationService.isUserEmailExists(userEmail);
     }
 
     /**
@@ -79,6 +78,6 @@ public class AuthenticationController {
      * @return True if the email id is already present on the user list
      */
     public boolean isNumberExists(String phoneNumber) {
-        return authenticationService2.isNumberExists(phoneNumber);
+        return authenticationService.isNumberExists(phoneNumber);
     }
 }

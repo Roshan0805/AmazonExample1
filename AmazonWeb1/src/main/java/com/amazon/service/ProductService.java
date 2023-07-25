@@ -22,7 +22,7 @@ public interface ProductService {
 
     /**
      * <p>
-     * Represents the {@link ProductService} interface implemented class object can be created for only one time
+     * Method to provide access to the single instance for accessing
      * </p>
      *
      * @return Represents the object of {@link ProductServiceImpl}
@@ -33,25 +33,25 @@ public interface ProductService {
 
     /**
      * <p>
-     * Add product to the product list
+     * This method is used to add a new product to the database
      * </p>
      *
-     * @param product Product object
-     * @return Boolean true is the {@link Product} added successfully in the product list otherwise return false
+     * @param product Represents {@link Product}
+     * @return True if the {@link Product} is added successfully in the product list otherwise return false
      */
-    boolean add(final Product product);
+    boolean create(final Product product);
 
     /**
      * <p>
-     * Provide the collection view of the products value
+     * Retrieves a list of all products from the database
      * </p>
      *
-     * @return Collection view of {@link Product}
+     * @return Collection view of products from the viewProduct method
      */
-    Collection<Product> getAllProducts();
+    Collection<Product> getProducts();
 
     /**
-     * Represents the product details that the user create
+     * Defines the product details that the user create
      *
      * @param userId Represents admin id
      * @return Represents {@link Product} list created by the user
@@ -60,17 +60,17 @@ public interface ProductService {
 
     /**
      * <p>
-     * Gets the product from product list using productId
+     * Retrieve product object from the database
      * </p>
      *
-     * @param productId product id of the product object
-     * @return Represent {@link Product} in product list
+     * @param productId id of the product
+     * @return Represents {@link Product}
      */
     Product get(final Long productId);
 
     /**
      * <p>
-     * Updates product object in product list
+     * Updates product object in database
      * </p>
      *
      * @param id      Product id of the product
@@ -81,7 +81,7 @@ public interface ProductService {
 
     /**
      * <p>
-     * Deletes the product object from the product list
+     * Deletes the product object from the database
      * </p>
      *
      * @param id id of the product object
@@ -90,7 +90,7 @@ public interface ProductService {
     boolean delete(final Long id);
 
     /**
-     * Represents the order of {@link Product}
+     * Describes the order of {@link Product}
      *
      * @param order Represents {@link Order}
      * @return True if the order is added to the order list
@@ -98,72 +98,81 @@ public interface ProductService {
     boolean order(final Order order);
 
     /**
-     * Retrieve the List of {@link Order}
+     * Describes the List of {@link Order}
      *
      * @return Represents collection of {@link Order}
      */
     List<Order> getOrderList(final Long userId);
 
     /**
-     * Represents the order details of the particular order id
+     * Retrieves the order details of the particular order id
+     *
      * @param orderId Represents the id of the {@link Product}
      * @return Represents {@link Order}
      */
     Order getOrder(final Long orderId);
 
     /**
-     * Represents the cancelling the order of the particular order id
+     * Describes the cancelling the order of the particular order id
+     *
      * @param orderId Represents the id of the {@link Product}
      * @return Represents {@link Order}
      */
     boolean cancelOrder(final Long orderId);
 
     /**
-     * Represents adding the product to cart list
+     * Describes adding the product to cart list
+     *
      * @param cart Represents {@link Cart}
      * @return True if the product is added to cart successfully
      */
-    boolean addToCart(final Cart cart) ;
+    boolean addToCart(final Cart cart);
 
     /**
-     * Represents the Product details from the cart for a particular user
+     * Describes  the Product details from the cart for a particular user
+     *
      * @param userId Represents the id of {@link User}
      * @return Collection of products from the cart
      */
     List<Cart> getCartList(final Long userId);
 
     /**
-     * Represents the particular id details of entered cart id
+     * Retrieves the particular id details of entered cart id
+     *
      * @param id Represents the id of the cart
      * @return Represents {@link Cart}
      */
     Cart getCart(final Long id);
 
     /**
-     * Represents the product id's of the user created product
+     * Retrieves the product id's of the user created product
+     *
      * @param userId Represents the id of the {@link User}
      * @return List of product id's
      */
     List<Long> getCartProductIds(final Long userId);
 
     /**
-     * Represents the removal of product for the particular cart id
+     * Describes  the removal of product for the particular cart id
+     *
      * @param cartId Represents the id of the cart
      * @return True if the Product is removed successfully
      */
-    boolean removeCart(final Long cartId);
+    boolean removeFromCart(final Long cartId);
 
     /**
-     * Represents updating the quantity of product in cart
-     * @param quantity Quantity need to add with available products
+     * describes updating the quantity of product in cart
+     *
+     * @param quantity  Quantity need to add with available products
      * @param productId Represents the id of the product need to update the quantity
      * @return True if the product quantity updated successfully
      */
     boolean updateQuantityInCart(final Long quantity, final Long productId);
 
     /**
-     * Represents updating the quantity of product in {@link Product}
-     * @param quantity Quantity need to add with available products
+     * describes updating the quantity of product in {@link Product}
+     *
+     * @param quantity  Quantity need to add with available products
      * @param productId Represents the id of the product need to update the quantity
      * @return True if the product quantity updated successfully
      */

@@ -1,43 +1,41 @@
 package com.amazon.dao.impl;
 
-import com.amazon.dao.UserServiceDao;
-import com.amazon.exception.DBException;
+import com.amazon.dao.UserDao;
+import com.amazon.exception.DatabaseException;
 import com.amazon.model.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
- * Implements the {@link UserServiceDao} and provide {@link User} service
+ * Implements the {@link UserDao} and provide {@link User} service
  * </p>
  *
  * @author Roshan
  * @version 1.0
  */
-public class UserServiceDaoImpl implements UserServiceDao {
+public class UserDaoImpl implements UserDao {
 
-    private static final UserServiceDao USER_SERVICE_DAO = new UserServiceDaoImpl();
-    private final DBConnection dbConnection ;
-    private final DataSourceDBConnection dataSourceDBConnection ;
+    private static final UserDao USER_SERVICE_DAO = new UserDaoImpl();
+    private final DatabaseConnector database;
 
-    private UserServiceDaoImpl() {
-       dbConnection = DBConnection.getInstance();
-       dataSourceDBConnection = DataSourceDBConnection.getInstance();
+    private UserDaoImpl() {
+        this.database = DatabaseConnector.getInstance();
     }
 
     /**
      * <p>
-     * Represents the object of {@link UserServiceDaoImpl} class can be created for only one time
+     * Method to provide access to the single instance for accessing
      * </p>
      *
-     * @return Represents {@link UserServiceDao}
+     * @return Represents {@link UserDao}
      */
-    public static UserServiceDao getInstance() {
+    public static UserDao getInstance() {
         return USER_SERVICE_DAO;
     }
 
@@ -49,10 +47,10 @@ public class UserServiceDaoImpl implements UserServiceDao {
      *
      * @param id User email
      * @return User object from the user list
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public User getDetails(final Long id) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "SELECT * FROM USERS WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -68,12 +66,11 @@ public class UserServiceDaoImpl implements UserServiceDao {
                 user.setPassword(result.getString(4));
                 user.setAddress(result.getString(5));
                 user.setPhoneNumber(result.getString(6));
-                dbConnection.release(connection);
 
                 return user;
             }
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
         return null;
     }
@@ -85,35 +82,36 @@ public class UserServiceDaoImpl implements UserServiceDao {
      *
      * @param user_id Represents the id of {@link User}
      * @return Boolean true is the user is deleted successfully
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean deleteUser(final Long user_id) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "DELETE FROM USERS WHERE ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setLong(1, user_id);
             statement.execute();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
     /**
-     * Represents all the {@link User} details in the usersList
+     * <p>
+     *     Retrieves a list of all users from the data source
+     * </p>
      *
-     * @return Represents collection of {@link User}
-     * @throws DBException Represents any error occur while executing a query
+     * @return A list containing all user records retrieved from the data source.
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
-    public Collection<User> getAllUser() {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+    public List<User> getUsers() {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "SELECT * FROM USERS";
             final PreparedStatement statement = connection.prepareStatement(query);
             final ResultSet result = statement.executeQuery();
-            final Collection<User> userList = new LinkedList<>();
+            final List<User> userList = new ArrayList<>();
 
             if (result.next()) {
                 final User user = new User();
@@ -126,11 +124,10 @@ public class UserServiceDaoImpl implements UserServiceDao {
                 user.setPhoneNumber(result.getString(6));
                 userList.add(user);
             }
-            dbConnection.release(connection);
 
             return userList;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 
@@ -142,10 +139,10 @@ public class UserServiceDaoImpl implements UserServiceDao {
      * @param user   Represents the updated {@link User}
      * @param userId Represents the user's id
      * @return true if updated successfully
-     * @throws DBException Represents any error occur while executing a query
+     * @throws DatabaseException can be thrown when there is a failure to database-related operation.
      */
     public boolean update(final User user, final Long userId) {
-        try (final Connection connection = dataSourceDBConnection.getDataSource().getConnection()) {
+        try (final Connection connection = database.getDataSource().getConnection()) {
             final String query = "UPDATE USERS SET NAME = ?, EMAIL = ?, PASSWORD = ?, ADDRESS = ?, PHONE_NUMBER = ?  where ID = ?";
             final PreparedStatement statement = connection.prepareStatement(query);
 
@@ -156,11 +153,10 @@ public class UserServiceDaoImpl implements UserServiceDao {
             statement.setString(5, user.getPhoneNumber());
             statement.setLong(6, userId);
             statement.execute();
-            dbConnection.release(connection);
 
             return true;
         } catch (SQLException exception) {
-            throw new DBException(exception.getMessage());
+            throw new DatabaseException(exception.getMessage());
         }
     }
 }

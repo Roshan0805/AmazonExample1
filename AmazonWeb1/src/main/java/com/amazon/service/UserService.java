@@ -4,6 +4,7 @@ import com.amazon.model.User;
 import com.amazon.service.impl.UserServiceImpl;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * <p>
@@ -17,7 +18,7 @@ public interface UserService {
 
     /**
      * <p>
-     * Represents the {@link UserService} interface implemented class object can be created for only one time
+     * Method to provide access to the single instance for accessing
      * </p>
      *
      * @return Represents the object of {@link UserServiceImpl}
@@ -29,17 +30,17 @@ public interface UserService {
 
     /**
      * <p>
-     * Gets the user details from the user list
+     * Retrieves the user details from the user list
      * </p>
      *
-     * @param id User email
-     * @return {@link User} object from the user list
+     * @param id Represents user's id
+     * @return describes {@link User} object
      */
     User get(final Long id);
 
     /**
      * <p>
-     * Delete the user from the user list
+     * Delete the user from the database
      * </p>
      *
      * @param user_id Represents the id of {@link User}
@@ -48,18 +49,21 @@ public interface UserService {
     boolean delete(final Long user_id);
 
     /**
-     * Represents all the {@link User} details in the usersList
+     * <p>
+     *     Retrieves a list of all users from the database
+     * </p>
      *
-     * @return Represents collection of {@link User}
+     * @return A list containing all user records retrieved from the data source.
      */
-    Collection<User> getAllUser();
+    Collection<User> getUsers();
 
     /**
-     * Represents the update of {@link User}
+     * Describes the update of {@link User}
      *
      * @param user Represents {@link User}
      * @param id   Represents the id of user
-     * @return True if the user is updated successfully
+     * @return True if the user is updated successfully otherwise return false
      */
     boolean update(final User user, final Long id);
+
 }

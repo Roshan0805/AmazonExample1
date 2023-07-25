@@ -1,7 +1,7 @@
 package com.amazon.service.Impl2;
 
-import com.amazon.dao.UserServiceDao;
-import com.amazon.dao.impl.UserServiceDaoImpl;
+import com.amazon.dao.UserDao;
+import com.amazon.dao.impl.UserDaoImpl;
 import com.amazon.model.User;
 import com.amazon.service.UserService;
 
@@ -9,7 +9,7 @@ import java.util.Collection;
 
 /**
  * <p>
- * Implements the {@link UserServiceDaoImpl} to provide services for {@link  User}
+ * Implements the {@link UserDaoImpl} to provide services for {@link  User}
  * </p>
  *
  * @author Roshan
@@ -18,10 +18,10 @@ import java.util.Collection;
 public class UserServiceImpl2 implements UserService {
 
     private static final UserService USER_SERVICE = new UserServiceImpl2();
-    private final UserServiceDao userServiceDao ;
+    private final UserDao userDao;
 
     private UserServiceImpl2() {
-        userServiceDao = UserServiceDaoImpl.getInstance();
+        userDao = UserDaoImpl.getInstance();
     }
 
     public static UserService getInstance() {
@@ -36,8 +36,8 @@ public class UserServiceImpl2 implements UserService {
      * @param id User email
      * @return User object from the user list
      */
-    public User get(Long id) {
-        return userServiceDao.getDetails(id);
+    public User get(final Long id) {
+        return userDao.getDetails(id);
     }
 
     /**
@@ -48,17 +48,19 @@ public class UserServiceImpl2 implements UserService {
      * @param userId Represents the id of {@link User}
      * @return Boolean true is the user is deleted successfully
      */
-    public boolean delete(Long userId) {
-        return userServiceDao.deleteUser(userId);
+    public boolean delete(final Long userId) {
+        return userDao.deleteUser(userId);
     }
 
     /**
-     * Represents all the {@link User} details in the usersList
+     * <p>
+     *     Retrieves a list of all users from the data source
+     * </p>
      *
-     * @return Represents collection of {@link User}
+     * @return A list containing all user records retrieved from the data source.
      */
-    public Collection<User> getAllUser() {
-        return userServiceDao.getAllUser();
+    public Collection<User> getUsers() {
+        return userDao.getUsers();
     }
 
     /**
@@ -69,6 +71,6 @@ public class UserServiceImpl2 implements UserService {
      * @return True if the user is updated successfully
      */
     public boolean update(final User user, final Long id) {
-        return userServiceDao.update(user, id);
+        return userDao.update(user, id);
     }
 }
