@@ -39,7 +39,7 @@ public class AuthenticationController {
      *
      * @param user Describes {@link User}
      */
-    public boolean signUp(User user) {
+    public boolean signUp(final User user) {
         return authenticationService.createUser(user);
     }
 
@@ -65,7 +65,7 @@ public class AuthenticationController {
      * @param userEmail User's email
      * @return True if the email id is already present on the user list
      */
-    public boolean isUserEmailExists(String userEmail) {
+    public boolean isUserEmailExists(final String userEmail) {
         return authenticationService.isUserEmailExists(userEmail);
     }
 
@@ -77,7 +77,7 @@ public class AuthenticationController {
      * @param phoneNumber User's email
      * @return True if the email id is already present on the user list
      */
-    public boolean isNumberExists(String phoneNumber) {
+    public boolean isNumberExists(final String phoneNumber) {
         return authenticationService.isNumberExists(phoneNumber);
     }
 }
