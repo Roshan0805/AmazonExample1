@@ -1,7 +1,0 @@
-name = Amazon
-created by = Roshan
-version = 1.0
-mainClass = ActivatorView
-database_url=jdbc:postgresql://localhost:5432/Amazon
-user=postgres
-password=roshan
