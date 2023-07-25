@@ -100,7 +100,7 @@ public class AuthenticationServlet extends HttpServlet {
             response.setContentType("application/json");
 
             if (authenticationController.signIn(user.getString("email"), user.getString("password"))) {
-                responseData.put("Message", json);
+                responseData.put("Message", "Sign in successfully");
 
             } else {
                 responseData.put("Message","Sign In unsuccessful");
